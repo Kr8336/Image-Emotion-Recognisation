@@ -1,7 +1,4 @@
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 import os
 import sys
@@ -11,17 +8,11 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from torchvision.datasets import ImageFolder
 
-
-
-
-
-
-
 if __name__ == '__main__':
 
     img_shape = (224, 224)
     folder_name = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Applications of Machine Learning\datasets_coursework2\Flickr\Flickr'
-    save_folder_name = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Applications of Machine Learning\datasets_coursework2\Normalized_FI'
+    save_folder_name = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Applications of Machine Learning\datasets_coursework2\Resized_FI'
 
     if not os.path.isdir(save_folder_name):
         print('Creating Reshaped images dataset...')

@@ -24,9 +24,9 @@ if __name__ == '__main__':
     min_class_size = 3000
     img_shape = (224, 224)
     folder_name = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Applications of Machine Learning\datasets_coursework2\Normalized_FI'
-    save_folder_name = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Applications of Machine Learning\datasets_coursework2\Augmented_FI'
+    save_folder_name = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Applications of Machine Learning\datasets_coursework2\Final_FI'
     if not os.path.isdir(save_folder_name):
-        print('Creating Reshaped images dataset...')
+        print('Creating Augmented images dataset...')
         os.mkdir(save_folder_name)
     else:
         print('Found Existing directory!')
@@ -63,14 +63,23 @@ if __name__ == '__main__':
             # the below line is prone to errors for idx less than 1000, but
             # it will work for us since all folders already have more than 1000 files
             save_aug_file = os.path.join(save_folder_name, clas, file_name.split('.')[0][:-4] + str(idx) + '.jpg')
-            print(save_aug_file)
             idx+=1
             if len(os.listdir(os.path.join(folder_name, clas)))<min_class_size//2:
                 augmented_img2 = T.ColorJitter()(img)
                 augmented_img2 = T.RandomErasing(p=0.7, scale=(0.025, 0.5), ratio=(0.3, 2))(augmented_img2)
+                save_aug_file2 = os.path.join(save_folder_name, clas, file_name.split('.')[0][:-4] + str(idx) + '.jpg')
+                idx+=1
+                augmented_img.save(save_aug_file2)
 
+            if len(os.listdir(os.path.join(folder_name, clas)))<min_class_size//3:
+                augmented_img3 = T.ElasticTransform(alpha=50, sigma=5)(img)
+                augmented_img3 = T.RandomHorizontalFlip()(augmented_img3)
+                augmented_img3 = T.RandomVerticalFlip()(augmented_img3)
+
+                save_aug_file3 = os.path.join(save_folder_name, clas, file_name.split('.')[0][:-4] + str(idx) + '.jpg')
+                idx += 1
+                augmented_img.save(save_aug_file3)
             # augmented_img.show()
-            augmented_img.save(save_aug_file)
 
             # if augmented_img.shape != (224, 224):
             #     print('Image corrupted!')
