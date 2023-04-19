@@ -13,6 +13,16 @@ from torch.utils.data.dataset import random_split
 from torchtext.data.functional import to_map_style_dataset
 
 
+def print_helper(num):
+    print('Executing Line', num)
+
+
+def yield_tokens(data_iter, tokenizer):
+    for _, text in data_iter:
+        yield tokenizer(text[0])
+
+
+
 ## Change these stupid arguments to kwargs***
 def train(model, dataloader, criterion, optimizer, epoch):
 
@@ -56,36 +66,36 @@ def main():
 
     folder_name = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Applications of Machine ' \
                   r'Learning\datasets_coursework2\Flickr\Flickr'
-    save_text = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Image-Emotion-Recognisation'
+    save_text = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Image-Emotion-Recognisation\captions.json'
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ### Make a dictionary from image name --> string generated...
 
-    if not os.path.isdir(save_text):
+    if not os.path.isfile(save_text):
         strings, dataset = generate_image_captions(folder_name)
         with open(save_text, 'w') as file:
             print('Generated Image Captions!')
             json.dump(dataset, file)
 
     else:
-        with open(save_text, 'rw') as file:
+        with open(save_text, 'r') as file:
             print('Found Image Captions Dataset')
             dataset = json.load(file)
 
     tokenizer = get_tokenizer('basic_english')
+    print_helper(85)
 
     train_iter = iter(dataset[:int(len(dataset)*.9)])
     test_iter = iter(dataset[int(len(dataset)*.9):])
+    print_helper(89)
 
-    vocab = build_vocab_from_iterator(yield_tokens(train_iter), specials=["<unk>"])
+    vocab = build_vocab_from_iterator(yield_tokens(train_iter, tokenizer), specials=["<unk>"])
     vocab.set_default_index(vocab["<unk>"])
-
+    print_helper(93)
 
     text_pipeline = lambda x: vocab(tokenizer(x))
     label_pipeline = lambda x: int(x)
-
-    print(text_pipeline('here is an example'))
-    print(label_pipeline('10'))
+    print_helper(96)
 
     # dataloader = DataLoader(train_iter, batch_size=4, shuffle=False, collate_fn=collate_batch)
 
@@ -93,7 +103,7 @@ def main():
     vocab_size = len(vocab)
     emsize = 64
     model = TextClassificationModel(vocab_size, emsize, num_class).to(device)
-
+    print_helper(107)
     # Hyperparameters
     EPOCHS = 10 # epoch
     LR = 0.1  # learning rate
@@ -103,11 +113,13 @@ def main():
     optimizer = torch.optim.SGD(model.parameters(), lr=LR)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.1)
     total_accu = None
+    print_helper(117)
 
     train_dataset = to_map_style_dataset(train_iter)
     test_dataset = to_map_style_dataset(test_iter)
     num_train = int(len(train_dataset) * 0.95)
     split_train_, split_valid_ = random_split(train_dataset, [num_train, len(train_dataset) - num_train])
+    print_helper(123)
 
     train_dataloader = DataLoader(split_train_, batch_size=BATCH_SIZE,
                                   shuffle=True, collate_fn=collate_batch)
@@ -115,11 +127,16 @@ def main():
                                   shuffle=True, collate_fn=collate_batch)
     test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,
                                  shuffle=True, collate_fn=collate_batch)
+    print_helper(131)
 
     for epoch in range(1, EPOCHS + 1):
         epoch_start_time = time.time()
         train(model, train_dataloader, criterion, optimizer, epoch)
+        print_helper(136)
+
         accu_val = evaluate(model, valid_dataloader, criterion)
+        print_helper(139)
+
         if total_accu is not None and total_accu > accu_val:
             scheduler.step()
         else:
@@ -133,6 +150,7 @@ def main():
 
     print('Checking the results of test dataset.')
     accu_test = evaluate(test_dataloader)
+    print_helper(154)
     print('test accuracy {:8.3f}'.format(accu_test))
 
 if __name__ == '__main__':

@@ -30,10 +30,6 @@ def predict_step(image_paths, gen_kwargs, device='cpu'):
       return preds
 
 
-def yield_tokens(data_iter):
-    for _, text in data_iter:
-        yield tokenizer(text)
-
 
 def generate_image_captions(folder_name):
 
@@ -60,7 +56,8 @@ def generate_image_captions(folder_name):
             text = predict_step([file_name], gen_kwargs, device) # ['a woman in a hospital bed with a woman in a hospital bed']
             class_strings.append(text)
 
-            dataset.append(i, text)
+            dataset.append((i, text))
+
         string_object.append(class_strings)
 
     return string_object, dataset
