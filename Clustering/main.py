@@ -1,6 +1,4 @@
 import os
-import sys
-import json
 import time
 
 from torch.utils.data import DataLoader
@@ -40,6 +38,7 @@ def train(model, dataloader, criterion, optimizer, epoch):
         optimizer.step()
         total_acc += (predicted_label.argmax(1) == label).sum().item()
         total_count += label.size(0)
+
         if idx % log_interval == 0 and idx > 0:
             elapsed = time.time() - start_time
             print('| epoch {:3d} | {:5d}/{:5d} batches '
@@ -54,28 +53,29 @@ def evaluate(model, dataloader, criterion):
     total_acc, total_count = 0, 0
 
     with torch.no_grad():
+
         for idx, (label, text, offsets) in enumerate(dataloader):
+
             predicted_label = model(text, offsets)
             loss = criterion(predicted_label, label)
             total_acc += (predicted_label.argmax(1) == label).sum().item()
             total_count += label.size(0)
             print(loss)
+
     return total_acc/total_count
 
 def main():
 
     folder_name = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Applications of Machine ' \
                   r'Learning\datasets_coursework2\Flickr\Flickr'
-    save_text = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Image-Emotion-Recognisation\captions.json'
+    save_text = r'C:\Users\c22056054\OneDrive - Cardiff University\Desktop\SM\Semester-II\Image-Emotion-Recognisation'
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-### Make a dictionary from image name --> string generated...
 
-    if not os.path.isfile(save_text):
-        strings, dataset = generate_image_captions(folder_name)
-        with open(save_text, 'w') as file:
-            print('Generated Image Captions!')
-            json.dump(dataset, file)
+    ### Make a dictionary from image name --> string generated...
+
+    if not os.path.isfile(os.path.join(save_text, 'amusement_captions.json')):
+        dataset = generate_image_captions(folder_name, save_text)
 
     else:
         with open(save_text, 'r') as file:
